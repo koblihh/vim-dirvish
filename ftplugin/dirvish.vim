@@ -24,6 +24,27 @@ if !hasmapto('<Plug>(dirvish_up)', 'n')
   execute 'nmap '.s:nowait.'<buffer> - <Plug>(dirvish_up)'
 endif
 
+function! s:dirvish_preview()
+  exe 'vert pedit +setl\ ro\ nornu\ nonu\ nobl\ buftype=nofile\ bufhidden=wipe\ noswf' expand('<cWORD>')
+  silent wincmd P
+  silent wincmd L
+  silent wincmd p
+endfunction
+function! s:dirvish_toggle_preview()
+  augroup dirvish_preview
+    au!
+    if get(b:, 'dirvish_preview', 0)
+      unlet b:dirvish_preview
+      pclose
+    else
+      let b:dirvish_preview = 1
+      au CursorMoved <buffer> call <SID>dirvish_preview()
+      call <SID>dirvish_preview()
+    endif
+  augroup END
+endfunction
+nnoremap <buffer><silent> P :call <SID>dirvish_toggle_preview()<cr>
+
 execute 'nnoremap '.s:nowait.'<buffer><silent> i    :<C-U>.call dirvish#open("edit", 0)<CR>'
 execute 'nnoremap '.s:nowait.'<buffer><silent> <CR> :<C-U>.call dirvish#open("edit", 0)<CR>'
 execute 'nnoremap '.s:nowait.'<buffer><silent> a    :<C-U>.call dirvish#open("vsplit", 1)<CR>'
